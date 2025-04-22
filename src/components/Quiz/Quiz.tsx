@@ -26,7 +26,7 @@ const Quiz = () => {
     ])
 
     const [indexQuestion, setIndexQuestion] = useState(0)
-    const [answerChecked, setAnswerChecked] = useState()
+    const [answerChecked, setAnswerChecked] = useState<number | null>(null)
 
 
     useEffect(() => {
@@ -47,7 +47,7 @@ const Quiz = () => {
                         questions[indexQuestion].answers.map((answer) => (
 
                             <div className="radio-group">
-                                <label className="custom-radio">
+                                <label className="custom-radio" onClick={() => setAnswerChecked(answer.id)}>
                                     <input type="radio" value={answer.id} checked={ answerChecked === answer.id } />
                                     <span className="radio-btn"></span>
                                     {answer.value}
