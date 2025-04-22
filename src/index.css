@@ -53,13 +53,18 @@ button {
   transition: background-color 0.2s;
 }
 
-button.primary {
+.button-primary {
   background-color: var(--color-primary);
   color: var(--color-white);
+  width: fit-content;
+  padding: 10px 30px;
+  border-radius: 50px;
+  transition: 0.5s;
 }
 
-button.primary:hover {
+.button-primary:hover {
   background-color: var(--color-primary-dark);
+  cursor: pointer;
 }
 
 a {
