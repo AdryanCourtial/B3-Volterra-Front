@@ -8,3 +8,17 @@ export interface Question {
     text: string
     answers: Answers[]
 }
+
+export interface AnswserToResponse {
+    questionId: number,
+    answerId: number
+}
+
+export interface ResponseAnswer {
+    answers: AnswserToResponse[]
+}
+
+export interface Result {
+    note: string
+    summary: string
+}

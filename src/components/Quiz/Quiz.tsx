@@ -1,63 +1,125 @@
 import { useEffect, useState } from "react"
-import { Question } from "../../interfaces/question.interface"
+import { AnswserToResponse, Question, ResponseAnswer, Result } from "../../interfaces/question.interface"
 import "./Quiz.css"
+import Results from "../Result/Result"
 
 const Quiz = () => {
 
     const [questions, setQuestions] = useState<Question[]>([
-        {
-            "id": 7,
-            "text": "As-tu des habitudes pour réduire ta conso électrique ?",
-            "answers": [
-            {
-                "id": 20,
-                "value": "Oui : je cuisine groupé, fais tourner mes machines la nuit, etc."
-            },
-            {
-                "id": 21,
-                "value": "Parfois, mais pas de façon régulière."
-            },
-            {
-                "id": 22,
-                "value": "Non, je fais pas vraiment attention."
-            }
-            ]
-        }
+
     ])
+
+    const fetchQuestion = async () => {
+        const response = await fetch("http://10.33.68.249:5000/volterra/questions/batch")
+        return response.json()
+    }
+
+    const postResponse = async () => {
+        console.log(JSON.stringify(responseAnswer))
+        const response = await fetch("http://10.33.68.249:5000/volterra/evaluation",
+            {
+                method: "POST",
+                body: JSON.stringify(responseAnswer),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                
+            }
+        )
+
+        return response.json()
+    }
 
     const [indexQuestion, setIndexQuestion] = useState(0)
     const [answerChecked, setAnswerChecked] = useState<number | null>(null)
+    const [responseAnswer, setResponseAnswer] = useState<ResponseAnswer>({
+        answers: []
+    })
+
+    const [isLoading, setIsLoading] = useState(false)
+    const [result, setResult] = useState<Result>()
 
 
     useEffect(() => {
-        // Requete API Vers les questions
-
-        setQuestions
+        fetchQuestion().then((value) => {
+            console.log(value)
+            setQuestions(value)
+        })
     }, [])
+
+    const OnNextQuestion = async () => {
+        if (!answerChecked) return
+
+        const FormatResponse: AnswserToResponse = {
+            questionId: questions[indexQuestion].id,
+            answerId: answerChecked
+        }
+
+        const updatedAnswers = [...responseAnswer.answers, FormatResponse];
+
+        setResponseAnswer({ answers: updatedAnswers });
+        
+        if (questions[indexQuestion].id === questions[questions.length - 1].id) {
+            setIsLoading(true)
+            postResponse().then((value) => {
+                setResult(value)
+            })
+            
+            return
+        }
+
+        setIndexQuestion(indexQuestion + 1)
+
+    }
 
     return (
         <main>
-            <div className="w-full text-center font-medium text-xl">
-                {questions[indexQuestion].text}
-            </div>
+            {
+                !isLoading ? (
+                    <div>
 
-            <div className="w-full">
-                <form>
-                    {
-                        questions[indexQuestion].answers.map((answer) => (
+                        <div className="w-full text-center font-medium text-xl">
+                            { questions.length !== 0 ? (
+                                questions[indexQuestion].text
+                            ) : null
+                            }
+                        </div>
 
-                            <div className="radio-group">
-                                <label className="custom-radio" onClick={() => setAnswerChecked(answer.id)}>
-                                    <input type="radio" value={answer.id} checked={ answerChecked === answer.id } />
-                                    <span className="radio-btn"></span>
-                                    {answer.value}
-                                </label>
+                        <div className="w-full">
+                            <form>
+                                {
+                                    questions.length !== 0 ? (
+                                        
+                                        questions[indexQuestion].answers.map((answer, index) => (
+                
+                                            <div className="radio-group" key={index}>
+                                                <label className="custom-radio">
+                                                    <input type="radio" value={answer.id} checked={ answerChecked === answer.id } onChange={() => setAnswerChecked(answer.id)}/>
+                                                    <span className="radio-btn"></span>
+                                                    {answer.value}
+                                                </label>
+                                            </div>
+                
+                                        ))
+                                    ) : null
+                                }
+                            </form>
+                        </div>
+
+                        <div>
+                            <div className="button-primary" onClick={() => OnNextQuestion()}>
+                                Suivant
                             </div>
-
-                        ))
+                        </div>
+                    </div>
+                ) : 
+                <div>
+                    { result ? (
+                        <Results result={result} />
+                    ) : <span className="loader"></span>
                     }
-                </form>
-            </div>
+                </div>
+            }
         </main>
     )
 }
