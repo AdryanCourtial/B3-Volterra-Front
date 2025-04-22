@@ -67,7 +67,8 @@ const Quiz = () => {
             
             return
         }
-
+        
+        setAnswerChecked(null)
         setIndexQuestion(indexQuestion + 1)
 
     }
@@ -76,7 +77,7 @@ const Quiz = () => {
         <main>
             {
                 !isLoading ? (
-                    <div>
+                    <div className="flex-col flex items-center justify-center gap-16">
 
                         <div className="w-full text-center font-medium text-xl">
                             { questions.length !== 0 ? (
@@ -85,14 +86,14 @@ const Quiz = () => {
                             }
                         </div>
 
-                        <div className="w-full">
+                        <div className="w-full mt-8 max-w-[800px]">
                             <form>
                                 {
                                     questions.length !== 0 ? (
                                         
                                         questions[indexQuestion].answers.map((answer, index) => (
                 
-                                            <div className="radio-group" key={index}>
+                                            <div className="radio-group my-2" key={index}>
                                                 <label className="custom-radio">
                                                     <input type="radio" value={answer.id} checked={ answerChecked === answer.id } onChange={() => setAnswerChecked(answer.id)}/>
                                                     <span className="radio-btn"></span>
@@ -106,7 +107,7 @@ const Quiz = () => {
                             </form>
                         </div>
 
-                        <div>
+                        <div className="flex justify-center w-full">
                             <div className="button-primary" onClick={() => OnNextQuestion()}>
                                 Suivant
                             </div>
@@ -116,7 +117,10 @@ const Quiz = () => {
                 <div>
                     { result ? (
                         <Results result={result} />
-                    ) : <span className="loader"></span>
+                    ) : <div className="w-full h-full flex flex-col justify-center items-center">
+                            <span className="loader"></span>
+                            <p className="font-bold text-3xl">Génération du compte rendu</p>
+                        </div>
                     }
                 </div>
             }

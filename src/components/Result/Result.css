@@ -1,0 +1,5 @@
+.container_result {
+    border: 1px solid var(--color-primary);
+    border-radius: 10px;
+    padding: 5px;
+}
